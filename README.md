@@ -1,4 +1,4 @@
-###### SWF Player is still in beta. Seek mild causes.
+###### SWF Player is still in beta. Seek mild bugs.
 
 ## SWF Player
 
