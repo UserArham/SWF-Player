@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SWF Player</title>
+
+    <meta name="description" content="A simple browser-based SWF player powered by Ruffle.">
+</head>
+
+<body>
+
+<div class="app">
+
+    <header>
+        <h1>Shockwave Flash Player</h1>
+    </header>
+
+    <div class="toolbar">
+
+        <label class="file-button" for="fileInput">
+            Open SWF
+        </label>
+
+        <input
+            type="file"
+            id="fileInput"
+            accept=".swf,application/x-shockwave-flash">
+
+        <button id="reloadButton" disabled>
+            Reload
+        </button>
+
+        <button id="unloadButton" disabled>
+            Unload
+        </button>
+
+        <button id="fullscreenButton">
+            Fullscreen
+        </button>
+
+    </div>
+
+    <main class="main">
+
+        <div class="player-container" id="playerContainer">
+
+            <div id="player">
+                <div class="placeholder">
+                    Open a SWF file to begin.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="information">
+
+            <div id="fileName">
+                No file loaded yet
+            </div>
+
+            <div class="volume-control">
+
+                <label for="volumeSlider">
+                    Volume
+                </label>
+
+                <input
+                    type="range"
+                    id="volumeSlider"
+                    min="0"
+                    max="100"
+                    value="100">
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer>
+        Powered by Ruffle
+        <span id="status"> | Ready</span>
+    </footer>
+
+</div>
+</body>
+</html>
