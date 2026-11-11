@@ -1,11 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>SWF Player</title>
-    <link type="image/png" rel="shortcut icon" href="/Adobe Flash-Player.png" />
+
     <meta name="description" content="A simple browser-based SWF player powered by Ruffle.">
 
     <style>
@@ -94,20 +95,23 @@
             padding: 16px;
         }
 
-        /* Fixed-size player: no flex growth or viewport resizing. */
+        /* Player */
 
         .player-container {
-        height: 800px;
-        min-height: 350px;
-        flex: none;
-  }
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            width: 100%;
+            height: 800px;
+            min-height: 350px;
+            flex: none;
+            overflow: hidden;
+            background: #000000;
+            border: 1px solid #333333;
+            border-radius: 4px;
+        }
 
-      @media (max-width: 600px) {
-        .player-container {
-          height: 600px;
-         min-height: 280px;
-      }
-  }
         #player {
             position: relative;
             display: block;
@@ -143,6 +147,8 @@
             text-align: center;
         }
 
+        /* Information */
+
         .information {
             display: flex;
             align-items: center;
@@ -173,7 +179,7 @@
             font-size: 12px;
         }
 
-        /* Manual fullscreen. */
+        /* Fullscreen */
 
         .player-container:fullscreen {
             display: flex;
@@ -196,6 +202,8 @@
             height: 100%;
         }
 
+        /* Mobile */
+
         @media (max-width: 600px) {
             header {
                 padding: 12px;
@@ -210,7 +218,7 @@
             }
 
             .player-container {
-                height: 450px;
+                height: 600px;
                 min-height: 280px;
             }
 
@@ -342,6 +350,7 @@
     let ruffleInstance = null;
     let currentFile = null;
     let currentURL = null;
+
     let loadGeneration = 0;
     let resizeObserver = null;
 
@@ -363,6 +372,8 @@
         });
     }
 
+    /* Player sizing */
+
     function updatePlayerSize() {
         if (!ruffleInstance) {
             return;
@@ -370,8 +381,11 @@
 
         const rect = playerElement.getBoundingClientRect();
 
-        ruffleInstance.style.width = Math.max(1, rect.width) + "px";
-        ruffleInstance.style.height = Math.max(1, rect.height) + "px";
+        ruffleInstance.style.width =
+            Math.max(1, rect.width) + "px";
+
+        ruffleInstance.style.height =
+            Math.max(1, rect.height) + "px";
     }
 
     function initializeResizeObserver() {
@@ -385,6 +399,8 @@
 
         resizeObserver.observe(playerContainer);
     }
+
+    /* Initialize Ruffle */
 
     function initializeRuffle() {
         if (!window.RufflePlayer) {
@@ -418,11 +434,14 @@
 
         } catch (error) {
             setStatus("Could not initialize Ruffle");
+
             console.error(error);
 
             return false;
         }
     }
+
+    /* Load SWF */
 
     async function loadSWF(file) {
         if (!file) {
@@ -472,7 +491,7 @@
 
             updatePlayerSize();
 
-            // No automatic fullscreen.
+            // Never automatically enter fullscreen.
 
         } catch (error) {
             if (generation !== loadGeneration) {
@@ -494,6 +513,8 @@
             ruffleInstance = null;
         }
     }
+
+    /* Reload SWF */
 
     async function reloadSWF() {
         if (!currentFile) {
@@ -528,13 +549,14 @@
 
             setStatus("Reloaded");
 
-            // No automatic fullscreen.
-
         } catch (error) {
             console.error(error);
+
             setStatus("Reload failed");
         }
     }
+
+    /* Unload SWF */
 
     function unloadSWF() {
         loadGeneration++;
@@ -569,6 +591,8 @@
         setStatus("Ready");
     }
 
+    /* Manual fullscreen */
+
     async function toggleFullscreen() {
         try {
             if (document.fullscreenElement) {
@@ -578,9 +602,12 @@
             }
         } catch (error) {
             console.error("Fullscreen error:", error);
+
             setStatus("Fullscreen unavailable");
         }
     }
+
+    /* File input */
 
     fileInput.addEventListener("change", event => {
         const file = event.target.files[0];
@@ -590,11 +617,15 @@
         }
     });
 
+    /* Buttons */
+
     reloadButton.addEventListener("click", reloadSWF);
 
     unloadButton.addEventListener("click", unloadSWF);
 
     fullscreenButton.addEventListener("click", toggleFullscreen);
+
+    /* Volume */
 
     volumeSlider.addEventListener("input", () => {
         if (ruffleInstance) {
@@ -602,6 +633,8 @@
                 Number(volumeSlider.value) / 100;
         }
     });
+
+    /* Drag and drop */
 
     playerContainer.addEventListener("dragover", event => {
         event.preventDefault();
@@ -617,34 +650,55 @@
         }
     });
 
+    /* Fullscreen resize */
+
     document.addEventListener("fullscreenchange", () => {
         updatePlayerSize();
     });
 
+    /* Keyboard shortcuts */
+
     document.addEventListener("keydown", event => {
         const target = event.target;
 
+        // Do not activate shortcuts while typing.
         if (
             target instanceof HTMLInputElement ||
-            target instanceof HTMLTextAreaElement
+            target instanceof HTMLTextAreaElement ||
+            target instanceof HTMLSelectElement ||
+            target.isContentEditable
         ) {
             return;
         }
 
-        if (event.ctrlKey && event.key.toLowerCase() === "o") {
+        // Ctrl + O opens a SWF file.
+        if (
+            event.ctrlKey &&
+            !event.shiftKey &&
+            event.key.toLowerCase() === "o"
+        ) {
             event.preventDefault();
+
             fileInput.click();
+
+            return;
         }
 
+        // F toggles fullscreen only outside text fields.
         if (
             event.key.toLowerCase() === "f" &&
             !event.ctrlKey &&
-            !event.altKey
+            !event.altKey &&
+            !event.metaKey &&
+            !event.shiftKey
         ) {
             event.preventDefault();
+
             toggleFullscreen();
         }
     });
+
+    /* Release resources */
 
     window.addEventListener("pagehide", () => {
         if (currentURL) {
@@ -652,6 +706,8 @@
             currentURL = null;
         }
     });
+
+    /* Initialize */
 
     window.addEventListener("load", () => {
         if (initializeRuffle()) {
