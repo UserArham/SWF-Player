@@ -6,11 +6,21 @@
     <meta name="description" content="A browser-based SWF player powered by Ruffle.">
     <title>SWF Player</title>
 
+    <!-- Ruffle -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+    <!-- Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet"
+    >
 
     <style>
         * {
             box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
@@ -18,7 +28,7 @@
             padding: 20px;
             background: #151515;
             color: #ffffff;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         .app {
@@ -39,6 +49,7 @@
         h1 {
             margin: 0;
             font-size: 25px;
+            font-weight: 500;
         }
 
         .toolbar {
@@ -56,6 +67,7 @@
             background: #292929;
             color: white;
             font-size: 14px;
+            font-weight: 400;
             cursor: pointer;
             transition: background 0.15s;
         }
@@ -140,6 +152,12 @@
             color: #888;
             text-align: center;
             font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.2s ease;
+        }
+
+        .placeholder.hidden {
+            display: none;
         }
 
         .bottom-controls {
@@ -154,6 +172,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
 
         input[type="range"] {
@@ -162,20 +181,11 @@
             cursor: pointer;
         }
 
-        .status {
-            margin-top: 15px;
-            padding: 12px;
-            background: #222;
-            border: 1px solid #333;
-            border-radius: 5px;
-            color: #aaa;
-            overflow-wrap: anywhere;
-        }
-
         .file-name {
             margin-top: 10px;
             color: #aaa;
             font-size: 13px;
+            font-weight: 400;
             overflow-wrap: anywhere;
         }
 
@@ -215,6 +225,7 @@
         </header>
 
         <div class="toolbar">
+
             <label class="file-button" for="fileInput">
                 Open SWF file
             </label>
@@ -236,14 +247,19 @@
             <button id="fullscreenButton">
                 Fullscreen
             </button>
+
         </div>
 
         <section class="player-container" id="playerContainer">
+
             <div id="player">
+
                 <div class="placeholder" id="placeholder">
                     Open a SWF file to start playing Flash content.
                 </div>
+
             </div>
+
         </section>
 
         <div class="file-name" id="fileName">
@@ -251,7 +267,9 @@
         </div>
 
         <div class="bottom-controls">
+
             <div class="volume-control">
+
                 <label for="volumeSlider">Volume</label>
 
                 <input
@@ -263,11 +281,9 @@
                 >
 
                 <span id="volumeValue">100%</span>
-            </div>
-        </div>
 
-        <div class="status" id="status">
-            Ready
+            </div>
+
         </div>
 
     </main>
@@ -290,7 +306,6 @@
         const volumeValue = document.getElementById("volumeValue");
 
         const fileNameElement = document.getElementById("fileName");
-        const statusElement = document.getElementById("status");
 
         // --------------------------------------------------
         // VARIABLES
@@ -301,6 +316,7 @@
         let currentURL = null;
         let resizeObserver = null;
         let loadGeneration = 0;
+        let placeholderTimer = null;
 
         // --------------------------------------------------
         // RUFFLE CONFIGURATION
@@ -321,11 +337,30 @@
         };
 
         // --------------------------------------------------
-        // STATUS
+        // PLACEHOLDER
         // --------------------------------------------------
 
-        function setStatus(message) {
-            statusElement.textContent = message;
+        function hidePlaceholder() {
+            if (placeholderTimer) {
+                clearTimeout(placeholderTimer);
+                placeholderTimer = null;
+            }
+
+            placeholder.classList.add("hidden");
+        }
+
+        function showPlaceholder() {
+            hidePlaceholder();
+
+            placeholder.classList.remove("hidden");
+
+            placeholder.textContent =
+                "Open a SWF file to start playing Flash content.";
+
+            placeholderTimer = setTimeout(() => {
+                placeholder.classList.add("hidden");
+                placeholderTimer = null;
+            }, 1000);
         }
 
         // --------------------------------------------------
@@ -424,11 +459,12 @@
             }
 
             if (!file.name.toLowerCase().endsWith(".swf")) {
-                setStatus("Error: Please select a valid SWF file.");
                 return;
             }
 
             const generation = ++loadGeneration;
+
+            hidePlaceholder();
 
             if (currentURL) {
                 URL.revokeObjectURL(currentURL);
@@ -443,8 +479,6 @@
 
             reloadButton.disabled = false;
             unloadButton.disabled = false;
-
-            setStatus("Loading " + file.name + "...");
 
             try {
                 await initializeRuffle();
@@ -466,19 +500,12 @@
                 updateVolume();
                 updatePlayerSize();
 
-                setStatus("Successfully loaded: " + file.name);
-
             } catch (error) {
                 if (generation !== loadGeneration) {
                     return;
                 }
 
                 console.error("SWF loading error:", error);
-
-                setStatus(
-                    "Error loading SWF: " +
-                    (error.message || String(error))
-                );
             }
         }
 
@@ -491,15 +518,13 @@
                 return;
             }
 
-            setStatus("Reloading " + currentFile.name + "...");
-
             const file = currentFile;
 
             await loadSWF(file);
         }
 
         // --------------------------------------------------
-        // UNLOAD SWF
+        // RESET / UNLOAD SWF
         // --------------------------------------------------
 
         function unloadSWF() {
@@ -530,9 +555,12 @@
             playerElement.innerHTML = "";
 
             const newPlaceholder = document.createElement("div");
+
             newPlaceholder.className = "placeholder";
+            newPlaceholder.id = "placeholder";
+
             newPlaceholder.textContent =
-                "Open a SWF file to start playing.";
+                "Open a SWF file to start playing Flash content.";
 
             playerElement.appendChild(newPlaceholder);
 
@@ -541,7 +569,7 @@
             reloadButton.disabled = true;
             unloadButton.disabled = true;
 
-            setStatus("Ready");
+            showPlaceholder();
         }
 
         // --------------------------------------------------
@@ -557,7 +585,6 @@
                 }
             } catch (error) {
                 console.error("Fullscreen error:", error);
-                setStatus("Could not change fullscreen mode.");
             }
         }
 
@@ -602,6 +629,7 @@
 
         playerContainer.addEventListener("dragover", event => {
             event.preventDefault();
+
             playerContainer.classList.add("drop-active");
         });
 
@@ -628,7 +656,7 @@
         // --------------------------------------------------
 
         // Ctrl + O opens a SWF file.
-        // There is NO F-key fullscreen shortcut.
+        // F does NOT toggle fullscreen.
 
         document.addEventListener("keydown", event => {
             const target = event.target;
@@ -662,6 +690,10 @@
                 URL.revokeObjectURL(currentURL);
                 currentURL = null;
             }
+
+            if (placeholderTimer) {
+                clearTimeout(placeholderTimer);
+            }
         });
 
         // --------------------------------------------------
@@ -669,12 +701,7 @@
         // --------------------------------------------------
 
         window.addEventListener("load", () => {
-            if (!window.RufflePlayer) {
-                setStatus("Error: Ruffle failed to load.");
-                return;
-            }
-
-            setStatus("Ready");
+            showPlaceholder();
         });
 
     </script>
