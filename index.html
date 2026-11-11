@@ -1,101 +1,82 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="description" content="A browser-based SWF player powered by Ruffle.">
     <title>SWF Player</title>
 
-    <meta name="description" content="A simple browser-based SWF player powered by Ruffle.">
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 
     <style>
         * {
             box-sizing: border-box;
         }
 
-        html,
         body {
-            width: 100%;
-            min-height: 100%;
             margin: 0;
-        }
-
-        body {
-            background: #181818;
-            color: #eeeeee;
-            font-family: Roboto, Arial, sans-serif;
+            padding: 20px;
+            background: #151515;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
         }
 
         .app {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            background: #222222;
-            border-bottom: 1px solid #383838;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        header h1 {
+        h1 {
             margin: 0;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 25px;
         }
 
         .toolbar {
             display: flex;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
-            padding: 12px 20px;
-            background: #222222;
-            border-bottom: 1px solid #383838;
+            gap: 9px;
+            margin-bottom: 15px;
         }
 
         button,
         .file-button {
-            padding: 9px 14px;
-            border: 1px solid #555555;
-            border-radius: 4px;
-            background: #333333;
-            color: #eeeeee;
-            font-size: 13px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px 15px;
+            background: #292929;
+            color: white;
+            font-size: 14px;
             cursor: pointer;
+            transition: background 0.15s;
         }
 
         button:hover,
         .file-button:hover {
-            background: #444444;
-        }
-
-        button:active,
-        .file-button:active {
-            background: #292929;
+            background: #414141;
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
+        }
+
+        .file-button {
+            display: inline-block;
         }
 
         #fileInput {
             display: none;
         }
-
-        .main {
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            padding: 16px;
-        }
-
-        /* Player */
 
         .player-container {
             position: relative;
@@ -107,79 +88,26 @@
             min-height: 350px;
             flex: none;
             overflow: hidden;
-            background: #000000;
-            border: 1px solid #333333;
+            background: #000;
+            border: 1px solid #333;
             border-radius: 4px;
         }
 
         #player {
             position: relative;
-            display: block;
             width: 100%;
             height: 100%;
             min-width: 0;
             min-height: 0;
             overflow: hidden;
-            background: #000000;
+            background: #000;
         }
 
         #player ruffle-player {
             display: block;
-            width: 100%;
-            height: 100%;
-            min-width: 0;
-            min-height: 0;
-            border: 0;
-            outline: 0;
-            background: #000000;
+            width: 100% !important;
+            height: 100% !important;
         }
-
-        .placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            min-height: 350px;
-            padding: 20px;
-            color: #999999;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        /* Information */
-
-        .information {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 12px 0 0;
-            color: #aaaaaa;
-            font-size: 13px;
-        }
-
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        input[type="range"] {
-            width: 110px;
-            accent-color: #aaaaaa;
-        }
-
-        footer {
-            padding: 12px 20px;
-            background: #222222;
-            border-top: 1px solid #383838;
-            color: #888888;
-            font-size: 12px;
-        }
-
-        /* Fullscreen */
 
         .player-container:fullscreen {
             display: flex;
@@ -189,7 +117,7 @@
             flex: none;
             border: 0;
             border-radius: 0;
-            background: #000000;
+            background: #000;
         }
 
         .player-container:fullscreen #player {
@@ -198,23 +126,71 @@
         }
 
         .player-container:fullscreen #player ruffle-player {
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        /* Mobile */
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            color: #888;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .bottom-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            width: 140px;
+            accent-color: #ffffff;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #aaa;
+            overflow-wrap: anywhere;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .drop-active {
+            outline: 3px dashed #888;
+            outline-offset: -8px;
+        }
 
         @media (max-width: 600px) {
-            header {
-                padding: 12px;
-            }
-
-            .toolbar {
-                padding: 10px 12px;
-            }
-
-            .main {
+            body {
                 padding: 10px;
+            }
+
+            h1 {
+                font-size: 21px;
             }
 
             .player-container {
@@ -225,191 +201,200 @@
             button,
             .file-button {
                 padding: 9px 11px;
+                font-size: 13px;
             }
         }
     </style>
-
-    <script>
-        window.RufflePlayer = window.RufflePlayer || {};
-
-        window.RufflePlayer.config = {
-            autoplay: "on",
-            unmuteOverlay: "visible",
-
-            backgroundColor: "#000000",
-
-            letterbox: "on",
-            contextMenu: "on",
-
-            showSwfDownload: false,
-            allowScriptAccess: false,
-
-            quality: "high",
-            scale: "showAll"
-        };
-    </script>
-
-    <script
-        src="https://unpkg.com/@ruffle-rs/ruffle"
-        defer>
-    </script>
 </head>
 
 <body>
+    <main class="app">
 
-<div class="app">
+        <header>
+            <h1>Shockwave Flash Player</h1>
+        </header>
 
-    <header>
-        <h1>Shockwave Flash Player</h1>
-    </header>
+        <div class="toolbar">
+            <label class="file-button" for="fileInput">
+                Open SWF file
+            </label>
 
-    <div class="toolbar">
+            <input
+                type="file"
+                id="fileInput"
+                accept=".swf,application/x-shockwave-flash"
+            >
 
-        <label class="file-button" for="fileInput">
-            Open SWF
-        </label>
+            <button id="reloadButton" disabled>
+                Reload
+            </button>
 
-        <input
-            type="file"
-            id="fileInput"
-            accept=".swf,application/x-shockwave-flash">
+            <button id="unloadButton" disabled>
+                Reset
+            </button>
 
-        <button id="reloadButton" disabled>
-            Reload
-        </button>
-
-        <button id="unloadButton" disabled>
-            Unload
-        </button>
-
-        <button id="fullscreenButton">
-            Fullscreen
-        </button>
-
-    </div>
-
-    <main class="main">
-
-        <div class="player-container" id="playerContainer">
-
-            <div id="player">
-                <div class="placeholder">
-                    Open a SWF file to begin.
-                </div>
-            </div>
-
+            <button id="fullscreenButton">
+                Fullscreen
+            </button>
         </div>
 
-        <div class="information">
-
-            <div id="fileName">
-                No file loaded yet
+        <section class="player-container" id="playerContainer">
+            <div id="player">
+                <div class="placeholder" id="placeholder">
+                    Open a SWF file to start playing Flash content.
+                </div>
             </div>
+        </section>
 
+        <div class="file-name" id="fileName">
+            No SWF file loaded
+        </div>
+
+        <div class="bottom-controls">
             <div class="volume-control">
-
-                <label for="volumeSlider">
-                    Volume
-                </label>
+                <label for="volumeSlider">Volume</label>
 
                 <input
                     type="range"
                     id="volumeSlider"
                     min="0"
                     max="100"
-                    value="100">
+                    value="100"
+                >
 
+                <span id="volumeValue">100%</span>
             </div>
+        </div>
 
+        <div class="status" id="status">
+            Ready
         </div>
 
     </main>
 
-    <footer>
-        Powered by Ruffle
-        <span id="status"> | Ready</span>
-    </footer>
+    <script>
+        // --------------------------------------------------
+        // ELEMENTS
+        // --------------------------------------------------
 
-</div>
+        const fileInput = document.getElementById("fileInput");
+        const playerContainer = document.getElementById("playerContainer");
+        const playerElement = document.getElementById("player");
+        const placeholder = document.getElementById("placeholder");
 
-<script>
-    const fileInput = document.getElementById("fileInput");
+        const reloadButton = document.getElementById("reloadButton");
+        const unloadButton = document.getElementById("unloadButton");
+        const fullscreenButton = document.getElementById("fullscreenButton");
 
-    const playerContainer = document.getElementById("playerContainer");
-    const playerElement = document.getElementById("player");
+        const volumeSlider = document.getElementById("volumeSlider");
+        const volumeValue = document.getElementById("volumeValue");
 
-    const reloadButton = document.getElementById("reloadButton");
-    const unloadButton = document.getElementById("unloadButton");
-    const fullscreenButton = document.getElementById("fullscreenButton");
+        const fileNameElement = document.getElementById("fileName");
+        const statusElement = document.getElementById("status");
 
-    const fileNameElement = document.getElementById("fileName");
-    const statusElement = document.getElementById("status");
+        // --------------------------------------------------
+        // VARIABLES
+        // --------------------------------------------------
 
-    const volumeSlider = document.getElementById("volumeSlider");
+        let ruffleInstance = null;
+        let currentFile = null;
+        let currentURL = null;
+        let resizeObserver = null;
+        let loadGeneration = 0;
 
-    let ruffleInstance = null;
-    let currentFile = null;
-    let currentURL = null;
+        // --------------------------------------------------
+        // RUFFLE CONFIGURATION
+        // --------------------------------------------------
 
-    let loadGeneration = 0;
-    let resizeObserver = null;
+        window.RufflePlayer = window.RufflePlayer || {};
 
-    function setStatus(message) {
-        statusElement.textContent = " | " + message;
-    }
+        window.RufflePlayer.config = {
+            autoplay: "on",
+            unmuteOverlay: "visible",
+            backgroundColor: "#000000",
+            letterbox: "on",
+            contextMenu: "on",
+            showSwfDownload: false,
+            allowScriptAccess: false,
+            quality: "high",
+            scale: "showAll"
+        };
 
-    function escapeHTML(value) {
-        return String(value).replace(/[&<>"']/g, character => {
-            const entities = {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#039;"
-            };
+        // --------------------------------------------------
+        // STATUS
+        // --------------------------------------------------
 
-            return entities[character];
-        });
-    }
-
-    /* Player sizing */
-
-    function updatePlayerSize() {
-        if (!ruffleInstance) {
-            return;
+        function setStatus(message) {
+            statusElement.textContent = message;
         }
 
-        const rect = playerElement.getBoundingClientRect();
+        // --------------------------------------------------
+        // PLAYER SIZING
+        // --------------------------------------------------
 
-        ruffleInstance.style.width =
-            Math.max(1, rect.width) + "px";
+        function updatePlayerSize() {
+            if (!ruffleInstance) {
+                return;
+            }
 
-        ruffleInstance.style.height =
-            Math.max(1, rect.height) + "px";
-    }
+            const rect = playerElement.getBoundingClientRect();
 
-    function initializeResizeObserver() {
-        if (resizeObserver) {
-            resizeObserver.disconnect();
+            if (rect.width <= 0 || rect.height <= 0) {
+                return;
+            }
+
+            ruffleInstance.style.width = rect.width + "px";
+            ruffleInstance.style.height = rect.height + "px";
         }
 
-        resizeObserver = new ResizeObserver(() => {
-            updatePlayerSize();
-        });
+        function initializeResizeObserver() {
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
 
-        resizeObserver.observe(playerContainer);
-    }
+            if (!("ResizeObserver" in window)) {
+                window.addEventListener("resize", updatePlayerSize);
+                return;
+            }
 
-    /* Initialize Ruffle */
+            resizeObserver = new ResizeObserver(() => {
+                updatePlayerSize();
+            });
 
-    function initializeRuffle() {
-        if (!window.RufflePlayer) {
-            setStatus("Ruffle is not available");
-            return false;
+            resizeObserver.observe(playerContainer);
+            resizeObserver.observe(playerElement);
         }
 
-        try {
-            playerElement.innerHTML = "";
+        // --------------------------------------------------
+        // VOLUME
+        // --------------------------------------------------
+
+        function updateVolume() {
+            const volume = Number(volumeSlider.value) / 100;
+
+            volumeValue.textContent = volumeSlider.value + "%";
+
+            if (ruffleInstance) {
+                try {
+                    ruffleInstance.volume = volume;
+                } catch (error) {
+                    console.warn("Could not update volume:", error);
+                }
+            }
+        }
+
+        // --------------------------------------------------
+        // INITIALIZE RUFFLE
+        // --------------------------------------------------
+
+        async function initializeRuffle() {
+            if (ruffleInstance) {
+                return ruffleInstance;
+            }
+
+            if (!window.RufflePlayer) {
+                throw new Error("Ruffle could not be loaded.");
+            }
 
             const ruffle = window.RufflePlayer.newest();
 
@@ -418,304 +403,280 @@
             ruffleInstance.style.display = "block";
             ruffleInstance.style.width = "100%";
             ruffleInstance.style.height = "100%";
-            ruffleInstance.style.border = "0";
-            ruffleInstance.style.outline = "0";
-            ruffleInstance.style.backgroundColor = "#000000";
 
+            playerElement.innerHTML = "";
             playerElement.appendChild(ruffleInstance);
 
-            ruffleInstance.ruffle().volume =
-                Number(volumeSlider.value) / 100;
-
+            updateVolume();
             initializeResizeObserver();
             updatePlayerSize();
 
-            return true;
-
-        } catch (error) {
-            setStatus("Could not initialize Ruffle");
-
-            console.error(error);
-
-            return false;
-        }
-    }
-
-    /* Load SWF */
-
-    async function loadSWF(file) {
-        if (!file) {
-            return;
+            return ruffleInstance;
         }
 
-        if (!file.name.toLowerCase().endsWith(".swf")) {
-            setStatus("Please select a SWF file");
-            return;
-        }
+        // --------------------------------------------------
+        // LOAD SWF
+        // --------------------------------------------------
 
-        const generation = ++loadGeneration;
-
-        currentFile = file;
-
-        if (currentURL) {
-            URL.revokeObjectURL(currentURL);
-            currentURL = null;
-        }
-
-        currentURL = URL.createObjectURL(file);
-
-        fileNameElement.textContent = file.name;
-
-        reloadButton.disabled = false;
-        unloadButton.disabled = false;
-
-        setStatus("Loading " + file.name);
-
-        if (!ruffleInstance && !initializeRuffle()) {
-            return;
-        }
-
-        try {
-            await ruffleInstance.ruffle().load({
-                url: currentURL
-            });
-
-            if (generation !== loadGeneration) {
+        async function loadSWF(file) {
+            if (!file) {
                 return;
             }
 
-            setStatus("Loaded " + file.name);
-
-            ruffleInstance.ruffle().volume =
-                Number(volumeSlider.value) / 100;
-
-            updatePlayerSize();
-
-            // Never automatically enter fullscreen.
-
-        } catch (error) {
-            if (generation !== loadGeneration) {
+            if (!file.name.toLowerCase().endsWith(".swf")) {
+                setStatus("Error: Please select a valid SWF file.");
                 return;
             }
 
-            console.error(error);
+            const generation = ++loadGeneration;
 
-            setStatus("Failed to load SWF");
+            if (currentURL) {
+                URL.revokeObjectURL(currentURL);
+                currentURL = null;
+            }
 
-            playerElement.innerHTML = `
-                <div class="placeholder">
-                    Could not load this SWF file.
-                    <br><br>
-                    ${escapeHTML(error.message || "Unknown error")}
-                </div>
-            `;
+            currentFile = file;
+            currentURL = URL.createObjectURL(file);
+
+            fileNameElement.textContent =
+                "Loaded file: " + file.name;
+
+            reloadButton.disabled = false;
+            unloadButton.disabled = false;
+
+            setStatus("Loading " + file.name + "...");
+
+            try {
+                await initializeRuffle();
+
+                if (generation !== loadGeneration) {
+                    return;
+                }
+
+                const player = ruffleInstance.ruffle();
+
+                await player.load({
+                    url: currentURL
+                });
+
+                if (generation !== loadGeneration) {
+                    return;
+                }
+
+                updateVolume();
+                updatePlayerSize();
+
+                setStatus("Successfully loaded: " + file.name);
+
+            } catch (error) {
+                if (generation !== loadGeneration) {
+                    return;
+                }
+
+                console.error("SWF loading error:", error);
+
+                setStatus(
+                    "Error loading SWF: " +
+                    (error.message || String(error))
+                );
+            }
+        }
+
+        // --------------------------------------------------
+        // RELOAD SWF
+        // --------------------------------------------------
+
+        async function reloadSWF() {
+            if (!currentFile) {
+                return;
+            }
+
+            setStatus("Reloading " + currentFile.name + "...");
+
+            const file = currentFile;
+
+            await loadSWF(file);
+        }
+
+        // --------------------------------------------------
+        // UNLOAD SWF
+        // --------------------------------------------------
+
+        function unloadSWF() {
+            loadGeneration++;
+
+            if (currentURL) {
+                URL.revokeObjectURL(currentURL);
+                currentURL = null;
+            }
+
+            currentFile = null;
+
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+                resizeObserver = null;
+            }
+
+            if (ruffleInstance) {
+                try {
+                    ruffleInstance.remove();
+                } catch (error) {
+                    console.warn(error);
+                }
+            }
 
             ruffleInstance = null;
-        }
-    }
 
-    /* Reload SWF */
+            playerElement.innerHTML = "";
 
-    async function reloadSWF() {
-        if (!currentFile) {
-            return;
-        }
+            const newPlaceholder = document.createElement("div");
+            newPlaceholder.className = "placeholder";
+            newPlaceholder.textContent =
+                "Open a SWF file to start playing.";
 
-        const generation = ++loadGeneration;
+            playerElement.appendChild(newPlaceholder);
 
-        if (!currentURL) {
-            currentURL = URL.createObjectURL(currentFile);
-        }
+            fileNameElement.textContent = "No SWF file loaded";
 
-        setStatus("Reloading");
+            reloadButton.disabled = true;
+            unloadButton.disabled = true;
 
-        if (!ruffleInstance && !initializeRuffle()) {
-            return;
+            setStatus("Ready");
         }
 
-        try {
-            await ruffleInstance.ruffle().load({
-                url: currentURL
-            });
+        // --------------------------------------------------
+        // MANUAL FULLSCREEN
+        // --------------------------------------------------
 
-            if (generation !== loadGeneration) {
+        async function toggleFullscreen() {
+            try {
+                if (!document.fullscreenElement) {
+                    await playerContainer.requestFullscreen();
+                } else {
+                    await document.exitFullscreen();
+                }
+            } catch (error) {
+                console.error("Fullscreen error:", error);
+                setStatus("Could not change fullscreen mode.");
+            }
+        }
+
+        document.addEventListener("fullscreenchange", () => {
+            fullscreenButton.textContent =
+                document.fullscreenElement
+                    ? "Exit Fullscreen"
+                    : "Fullscreen";
+
+            requestAnimationFrame(updatePlayerSize);
+        });
+
+        // --------------------------------------------------
+        // FILE INPUT
+        // --------------------------------------------------
+
+        fileInput.addEventListener("change", event => {
+            const file = event.target.files[0];
+
+            if (file) {
+                loadSWF(file);
+            }
+
+            fileInput.value = "";
+        });
+
+        // --------------------------------------------------
+        // BUTTON EVENTS
+        // --------------------------------------------------
+
+        reloadButton.addEventListener("click", reloadSWF);
+
+        unloadButton.addEventListener("click", unloadSWF);
+
+        fullscreenButton.addEventListener("click", toggleFullscreen);
+
+        volumeSlider.addEventListener("input", updateVolume);
+
+        // --------------------------------------------------
+        // DRAG AND DROP
+        // --------------------------------------------------
+
+        playerContainer.addEventListener("dragover", event => {
+            event.preventDefault();
+            playerContainer.classList.add("drop-active");
+        });
+
+        playerContainer.addEventListener("dragleave", event => {
+            if (!playerContainer.contains(event.relatedTarget)) {
+                playerContainer.classList.remove("drop-active");
+            }
+        });
+
+        playerContainer.addEventListener("drop", event => {
+            event.preventDefault();
+
+            playerContainer.classList.remove("drop-active");
+
+            const file = event.dataTransfer.files[0];
+
+            if (file) {
+                loadSWF(file);
+            }
+        });
+
+        // --------------------------------------------------
+        // KEYBOARD SHORTCUTS
+        // --------------------------------------------------
+
+        // Ctrl + O opens a SWF file.
+        // There is NO F-key fullscreen shortcut.
+
+        document.addEventListener("keydown", event => {
+            const target = event.target;
+
+            if (
+                target instanceof HTMLInputElement ||
+                target instanceof HTMLTextAreaElement ||
+                target instanceof HTMLSelectElement ||
+                target.isContentEditable
+            ) {
                 return;
             }
 
-            ruffleInstance.ruffle().volume =
-                Number(volumeSlider.value) / 100;
-
-            updatePlayerSize();
-
-            setStatus("Reloaded");
-
-        } catch (error) {
-            console.error(error);
-
-            setStatus("Reload failed");
-        }
-    }
-
-    /* Unload SWF */
-
-    function unloadSWF() {
-        loadGeneration++;
-
-        if (currentURL) {
-            URL.revokeObjectURL(currentURL);
-            currentURL = null;
-        }
-
-        currentFile = null;
-
-        if (resizeObserver) {
-            resizeObserver.disconnect();
-            resizeObserver = null;
-        }
-
-        ruffleInstance = null;
-
-        playerElement.innerHTML = `
-            <div class="placeholder">
-                Open a SWF file to begin.
-            </div>
-        `;
-
-        fileNameElement.textContent = "No file loaded yet";
-
-        reloadButton.disabled = true;
-        unloadButton.disabled = true;
-
-        fileInput.value = "";
-
-        setStatus("Ready");
-    }
-
-    /* Manual fullscreen */
-
-    async function toggleFullscreen() {
-        try {
-            if (document.fullscreenElement) {
-                await document.exitFullscreen();
-            } else {
-                await playerContainer.requestFullscreen();
+            if (
+                event.ctrlKey &&
+                !event.shiftKey &&
+                !event.altKey &&
+                event.key.toLowerCase() === "o"
+            ) {
+                event.preventDefault();
+                fileInput.click();
             }
-        } catch (error) {
-            console.error("Fullscreen error:", error);
+        });
 
-            setStatus("Fullscreen unavailable");
-        }
-    }
+        // --------------------------------------------------
+        // PAGE CLEANUP
+        // --------------------------------------------------
 
-    /* File input */
+        window.addEventListener("pagehide", () => {
+            if (currentURL) {
+                URL.revokeObjectURL(currentURL);
+                currentURL = null;
+            }
+        });
 
-    fileInput.addEventListener("change", event => {
-        const file = event.target.files[0];
+        // --------------------------------------------------
+        // INITIALIZATION
+        // --------------------------------------------------
 
-        if (file) {
-            loadSWF(file);
-        }
-    });
+        window.addEventListener("load", () => {
+            if (!window.RufflePlayer) {
+                setStatus("Error: Ruffle failed to load.");
+                return;
+            }
 
-    /* Buttons */
-
-    reloadButton.addEventListener("click", reloadSWF);
-
-    unloadButton.addEventListener("click", unloadSWF);
-
-    fullscreenButton.addEventListener("click", toggleFullscreen);
-
-    /* Volume */
-
-    volumeSlider.addEventListener("input", () => {
-        if (ruffleInstance) {
-            ruffleInstance.ruffle().volume =
-                Number(volumeSlider.value) / 100;
-        }
-    });
-
-    /* Drag and drop */
-
-    playerContainer.addEventListener("dragover", event => {
-        event.preventDefault();
-    });
-
-    playerContainer.addEventListener("drop", event => {
-        event.preventDefault();
-
-        const file = event.dataTransfer.files[0];
-
-        if (file) {
-            loadSWF(file);
-        }
-    });
-
-    /* Fullscreen resize */
-
-    document.addEventListener("fullscreenchange", () => {
-        updatePlayerSize();
-    });
-
-    /* Keyboard shortcuts */
-
-    document.addEventListener("keydown", event => {
-        const target = event.target;
-
-        // Do not activate shortcuts while typing.
-        if (
-            target instanceof HTMLInputElement ||
-            target instanceof HTMLTextAreaElement ||
-            target instanceof HTMLSelectElement ||
-            target.isContentEditable
-        ) {
-            return;
-        }
-
-        // Ctrl + O opens a SWF file.
-        if (
-            event.ctrlKey &&
-            !event.shiftKey &&
-            event.key.toLowerCase() === "o"
-        ) {
-            event.preventDefault();
-
-            fileInput.click();
-
-            return;
-        }
-
-        // F toggles fullscreen only outside text fields.
-        if (
-            event.key.toLowerCase() === "f" &&
-            !event.ctrlKey &&
-            !event.altKey &&
-            !event.metaKey &&
-            !event.shiftKey
-        ) {
-            event.preventDefault();
-
-            toggleFullscreen();
-        }
-    });
-
-    /* Release resources */
-
-    window.addEventListener("pagehide", () => {
-        if (currentURL) {
-            URL.revokeObjectURL(currentURL);
-            currentURL = null;
-        }
-    });
-
-    /* Initialize */
-
-    window.addEventListener("load", () => {
-        if (initializeRuffle()) {
             setStatus("Ready");
-        }
-    });
+        });
 
-</script>
-
+    </script>
 </body>
 </html>
