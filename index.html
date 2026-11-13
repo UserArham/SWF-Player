@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A browser-based SWF player powered by Ruffle.">
-    <title>SWF Player</title>
+    <meta name="description" content="A browser-based SWF player powered by Ruffle using JavaScript. Ruffle is coded using Rust.">
+    <title>Adobe SWF Player</title>
 
     <!-- Ruffle -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
@@ -221,13 +221,13 @@
     <main class="app">
 
         <header>
-            <h1>Shockwave Flash Player</h1>
+            <h1>Shockwave Adobe Flash Player</h1>
         </header>
 
         <div class="toolbar">
 
             <label class="file-button" for="fileInput">
-                Open SWF file
+                Open SWF File
             </label>
 
             <input
@@ -237,15 +237,15 @@
             >
 
             <button id="reloadButton" disabled>
-                Reload
+                Reload SWF
             </button>
 
             <button id="unloadButton" disabled>
-                Reset
+                Reset Player
             </button>
 
             <button id="fullscreenButton">
-                Fullscreen
+                Open Fullscreen
             </button>
 
         </div>
@@ -276,11 +276,11 @@
                     type="range"
                     id="volumeSlider"
                     min="0"
-                    max="100"
-                    value="100"
+                    max="105"
+                    value="105"
                 >
 
-                <span id="volumeValue">100%</span>
+                <span id="volumeValue">105%</span>
 
             </div>
 
@@ -450,7 +450,7 @@
         }
 
         // --------------------------------------------------
-        // LOAD SWF
+        // LOAD SWF FILES
         // --------------------------------------------------
 
         async function loadSWF(file) {
