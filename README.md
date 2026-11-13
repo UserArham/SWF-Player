@@ -6,7 +6,7 @@ An SWF Player backed by Ruffle.
 
 ## What It Could Run:
 
-It could run **any SWF**, like Super Mario 63 and other Flash games. Ruffle works a lot better for running Flash files, but it's compatibility is still 82%. For example, tests of Scratch 2.0 runs in Ruffle, though the color is off since it is still in beta.
+It could run **any SWF**, like Super Mario 63 and other Flash games. Ruffle works a lot better for running Flash files, but it's compatibility is still 82%. For example, tests of Scratch 2.0 runs in Ruffle. It is now in Release Candidate. Actually, the black color is normal since Ruffle is not fully compatible. My bad!
 
 <img width="1364" height="767" alt="image" src="https://github.com/user-attachments/assets/f24d104b-a124-4f9c-9f15-af15abf492ab" />
 
