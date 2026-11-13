@@ -1,4 +1,4 @@
-###### SWF Player is still in beta. Seek mild bugs.
+###### SWF Player is now transitioned to Release Candidate. Almost developed!
 
 ## SWF Player
 
