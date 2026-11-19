@@ -1,0 +1,13 @@
+commit origin -main "text.txt"
+
+// Note! This was no longer used anymore. It is unknown and is never heard. It was a fake Git file as GitHub never used them.
+
+
+You can use this for example:
+.gitattributes
+
+
+Run this command:
+git push origin branch
+
+Replace "branch" with any branch or "main/master".
